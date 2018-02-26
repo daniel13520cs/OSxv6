@@ -1,6 +1,6 @@
 #include "types.h"
 #include "stat.h"
-#include "user.h" /* write(), read() atoi()*/
+#include "user.h" /* write(), read() atoi(), printf(), free()*/
 
 char buf[1];
 
@@ -23,7 +23,6 @@ void head(int fd, int line)
 			exit();
 		}
 	}
-	free(buf);
 }
 
 
@@ -73,5 +72,6 @@ int main(int argc, char *argv[])
 			close(fd);
 		}
 	}
+	free(buf);
 	exit();
 }
