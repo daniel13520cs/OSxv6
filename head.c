@@ -18,6 +18,7 @@ void head(int fd, int line)
 			printf(1, "head: read error\n");
 			exit();
 		}
+		////#bug: head qqqqq(2 lines) stucks in buffer, need to clean the buf/////
 		//\r return key, \n next line
 		for(i = 0; count < line && i < sizeof(buf); i++){
 			if(strchr("\n", buf[i])){
