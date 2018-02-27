@@ -1,27 +1,32 @@
 #include "types.h"
 #include "stat.h"
-#include "user.h" /* write(), read() atoi(), printf(), free()*/
+#include "user.h" /* write(), read() atoi(), free(), printf()*/
 
-char buf[1];
+
+char buf[512];
 
 #define defaultLine 10
 
 void head(int fd, int line)
 {
 	// if line is given 0 by user or by (atoi(a) == 0), do nothing 
-	int n;
-	int count = 0;
+	int n, i;
+	int count = 0; int out_Bytes = 0;
 	while((count < line) && (n = read(fd, buf, sizeof(buf)) > 0))
 	{
-		//\r return key, \n next line
-		if(strchr("\n", buf[0])){
-			count++;
-		}
-		write(1, buf, n);
 		if(n < 0){
 			printf(1, "head: read error\n");
 			exit();
 		}
+		//\r return key, \n next line
+		for(i = 0; count < line && i < sizeof(buf); i++){
+			if(strchr("\n", buf[i])){
+				count++;
+			}
+			out_Bytes++;
+		}
+		write(1, buf, out_Bytes);
+		out_Bytes = 0;
 	}
 }
 
