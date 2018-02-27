@@ -12,26 +12,38 @@ char buf[512];
 //is read, replace the old lines. 
 void tail(int fd, int line)
 {
-	int n, i, l; int maxLineSize = 0;
+	int n, i, l = 0; int maxLineSize = 0;
 	int lineSize = 0;
 	// if line is given 0 by user or by (atoi(a) == 0), do nothing 
-	while((l < line) && (n = read(fd, buf, sizeof(buf)) > 0))
+	while((l < line) && (n = read(fd, buf, sizeof(buf))) > 0)
 	{
 		if(n < 0){
 			printf(1, "tail: read error\n");
 			exit();
 		}
-		char* tail = malloc( l * maxLineSize );
+		printf(1, "%d\n", sizeof(buf));
+		//char* tail = malloc( l * maxLineSize );
+		printf(1, "n = %d\n", n);
 		for(i = 0; i < n; i++){
+			printf(1, "buf[i] = %c", buf[i]);
 			if(buf[i] == '\n'){
 				l++;
 				if(lineSize > maxLineSize){
-					lineSize = maxLineSize;
+					maxLineSize = lineSize;
 				}
 				lineSize = 0;
+			} else {
+				lineSize++;
 			}
 		}
+		printf(1, "maxLineSize = %d", maxLineSize);
+		char* tail = malloc( l * maxLineSize );
+		//printf(1, "tail before memmove= %s\n", tail);
 		memmove(tail, buf, n);
+		//tail = "a";
+		printf(1, "tail after = %s\n", tail);
+		printf(1, "wtf");
+		
 	}
 
 }
