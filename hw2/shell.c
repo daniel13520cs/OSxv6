@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <unistd.h>
-#include <stdio.h>
-#include <fcntl.h>
+#include <stdio.h> /* dup(), open() */ 
+#include <fcntl.h> /* dup() */
 #include <string.h> /* sscanf(), strncat() */
 #include <assert.h>
 #include <sys/types.h>
@@ -66,9 +66,9 @@ runcmd(struct cmd *cmd)
     fprintf(stderr, "exec not implemented\n");
     // Your code here ...
     char path[PATHLEN] = "/bin/";
-		sscanf("/bin/","%s", path);
-		strncat(path, ecmd->argv[0], strlen(ecmd->argv[0]) );
-		execv((const char*) path, (char*const*) ecmd->argv);
+    sscanf("/bin/","%s", path);
+    strncat(path, ecmd->argv[0], strlen(ecmd->argv[0]) );
+    execv((const char*) path, (char*const*) ecmd->argv);
     break;
 
   case '>':
@@ -76,6 +76,15 @@ runcmd(struct cmd *cmd)
     rcmd = (struct redircmd*)cmd;
     fprintf(stderr, "redir not implemented\n");
     // Your code here ...
+    if(rcmd->type == '>'){
+      int fd_o = open(rcmd->file, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
+      dup2(fd_o, 1);
+      close(fd_o);
+    } else if (rcmd->type == '<'){
+      int fd_i = open(rcmd->file, O_RDONLY);
+      dup2(fd_i,0);
+      close(fd_i);
+    }
     runcmd(rcmd->cmd);
     break;
 
