@@ -1,10 +1,10 @@
 #include <stdlib.h>
 #include <unistd.h>/* pipe() */
-#include <stdio.h> /* dup(), open() */ 
+#include <stdio.h> /* dup(), open() */
 #include <fcntl.h> /* dup() */
 #include <string.h> /* sscanf(), strncat() */
 #include <assert.h>
-#include <sys/types.h>
+#include <sys/types.h> /* wait() */
 #include <sys/stat.h>
 
 #include <unistd.h> /* execv() */ 
@@ -64,10 +64,7 @@ runcmd(struct cmd *cmd)
     if(ecmd->argv[0] == 0)
       exit(0);
     // Your code here ...
-    char path[PATHLEN] = "/bin/";
-    sscanf("/bin/","%s", path);
-    strncat(path, ecmd->argv[0], strlen(ecmd->argv[0]) );
-    execv((const char*) path, (char*const*) ecmd->argv);
+    execvp((const char*) ecmd->argv[0], (char*const*) ecmd->argv);
     break;
 
   case '>':
@@ -98,9 +95,10 @@ runcmd(struct cmd *cmd)
       dup2(pipefd[0], 0);
       close(pipefd[1]);
       runcmd(pcmd->right);
+      wait();
     }
     break;
-  } 
+  }
   exit(0);
 }
 
