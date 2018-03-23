@@ -1,5 +1,5 @@
 #include <stdlib.h>
-#include <unistd.h>
+#include <unistd.h>/* pipe() */
 #include <stdio.h> /* dup(), open() */ 
 #include <fcntl.h> /* dup() */
 #include <string.h> /* sscanf(), strncat() */
@@ -63,7 +63,6 @@ runcmd(struct cmd *cmd)
     ecmd = (struct execcmd*)cmd;
     if(ecmd->argv[0] == 0)
       exit(0);
-    fprintf(stderr, "exec not implemented\n");
     // Your code here ...
     char path[PATHLEN] = "/bin/";
     sscanf("/bin/","%s", path);
@@ -74,34 +73,41 @@ runcmd(struct cmd *cmd)
   case '>':
   case '<':
     rcmd = (struct redircmd*)cmd;
-    fprintf(stderr, "redir not implemented\n");
     // Your code here ...
+    //give read,write,execute permission to the file created by the user
     if(rcmd->type == '>'){
-      int fd_o = open(rcmd->file, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
-      dup2(fd_o, 1);
-      close(fd_o);
-    } else if (rcmd->type == '<'){
-      int fd_i = open(rcmd->file, O_RDONLY);
-      dup2(fd_i,0);
-      close(fd_i);
+      rcmd->mode |= (S_IRWXU);
     }
+    int fd = open(rcmd->file, rcmd->mode);
+    dup2(fd,rcmd->fd);
+    close(fd);
     runcmd(rcmd->cmd);
     break;
 
   case '|':
     pcmd = (struct pipecmd*)cmd;
-    fprintf(stderr, "pipe not implemented\n");
     // Your code here ...
-      
+    int pipefd[2];
+    pipe(pipefd);
+    //child
+    if(fork() == 0){
+      dup2(pipefd[1], 1);
+      close(pipefd[0]);
+      runcmd(pcmd->left);
+    } else {
+      dup2(pipefd[0], 0);
+      close(pipefd[1]);
+      runcmd(pcmd->right);
+    }
     break;
-  }    
+  } 
   exit(0);
 }
 
 int
 getcmd(char *buf, int nbuf)
 {
-  
+
   if (isatty(fileno(stdin)))
     fprintf(stdout, "cs3224> ");
   memset(buf, 0, nbuf);
