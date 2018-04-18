@@ -1,0 +1,27 @@
+From 9dc66490ed8b4469b94909daae35c4a6cd5f2179 Mon Sep 17 00:00:00 2001
+From: chih-chien Hsiao <daniel13520cs@gmail.com>
+Date: Thu, 5 Apr 2018 22:26:03 -0400
+Subject: [PATCH 13/13] change init totalTickets and winner value
+
+---
+ proc.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/proc.c b/proc.c
+index 3005dcb..2e86016 100644
+--- a/proc.c
++++ b/proc.c
+@@ -300,8 +300,8 @@ scheduler(void)
+     acquire(&ptable.lock);
+     //init
+     int counter = 0;
+-    int totalTickets = 0;
+-    long winner = 0;
++    int totalTickets = getTotalTickets();
++    long winner = random_at_most(totalTickets);
+     for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+       if(p->state != RUNNABLE)
+         continue;
+-- 
+1.9.1
+

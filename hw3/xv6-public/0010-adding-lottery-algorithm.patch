@@ -1,0 +1,100 @@
+From b933a5a7eb2bf8ad683d102c02e5b74867d07c3f Mon Sep 17 00:00:00 2001
+From: Brendan Dolan-Gavitt <daniel13520cs@gmail.com>
+Date: Mon, 2 Apr 2018 16:51:28 -0400
+Subject: [PATCH 10/13] adding lottery algorithm
+
+---
+ lotterytest.c |  4 ++--
+ proc.c        | 45 ++++++++++++++++++++++++++++++++++++---------
+ 2 files changed, 38 insertions(+), 11 deletions(-)
+
+diff --git a/lotterytest.c b/lotterytest.c
+index 3b59f3c..713fa19 100644
+--- a/lotterytest.c
++++ b/lotterytest.c
+@@ -28,12 +28,12 @@ int main() {
+     gettime(&start);
+     printf(0, "starting test at %d hours %d minutes %d seconds\n", start.hour, start.minute, start.second);
+     if ((pid1 = fork()) == 0) {
+-        settickets(80);
++        settickets(800);
+         spin(80);
+         exit();
+     }
+     else if ((pid2 = fork()) == 0) {
+-        settickets(20);
++        settickets(200);
+         spin(20);
+         exit();
+     }
+diff --git a/proc.c b/proc.c
+index 9b08dea..0a9e0b0 100644
+--- a/proc.c
++++ b/proc.c
+@@ -260,6 +260,19 @@ wait(void)
+   }
+ }
+ 
++//adding
++int
++getTotalTickets(void)
++{
++  int tickets = 0;
++  struct proc* p;
++  for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
++    tickets += p->ticket;
++  }
++  return tickets;
++}
++
++
+ //PAGEBREAK: 42
+ // Per-CPU process scheduler.
+ // Each CPU calls scheduler() after setting itself up.
+@@ -283,20 +296,34 @@ scheduler(void)
+ 
+     // Loop over process table looking for process to run.
+     acquire(&ptable.lock);
++    //init
++    int counter = 0;
++    int totalTickets = 0;
++    int winner = 0;
+     for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
++      totalTickets = getTotalTickets();
++      if( p == ptable.proc ){
++        winner = random_at_most(totalTickets);
++      }
+       if(p->state != RUNNABLE)
+         continue;
+-
+       // Switch to chosen process.  It is the process's job
+       // to release ptable.lock and then reacquire it
+-      // before jumping back to us.
+-      foundproc = 1;
+-      proc = p;
+-      switchuvm(p);
+-      p->state = RUNNING;
+-      swtch(&cpu->scheduler, proc->context);
+-      switchkvm();
+-
++      // before jumping back to us. implemented lottery algorithm
++      //cprintf("winner = %d\n", winner);
++      counter = totalTickets + p->ticket;
++      if(winner < counter){
++        foundproc = 1;
++        proc = p;
++        switchuvm(p);
++        p->state = RUNNING;
++        swtch(&cpu->scheduler, proc->context);
++        switchkvm();
++	//update
++	counter = 0;
++	p = ptable.proc;
++	totalTickets = 0;
++      }
+       // Process is done running for now.
+       // It should have changed its p->state before coming back.
+       proc = 0;
+-- 
+1.9.1
+

@@ -1,0 +1,31 @@
+From b43bf3ddd30ca798808aaf1cee16fd71253b2174 Mon Sep 17 00:00:00 2001
+From: Brendan Dolan-Gavitt <daniel13520cs@gmail.com>
+Date: Mon, 2 Apr 2018 22:12:20 -0400
+Subject: [PATCH 11/13] done testing
+
+---
+ lotterytest.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/lotterytest.c b/lotterytest.c
+index 713fa19..3b59f3c 100644
+--- a/lotterytest.c
++++ b/lotterytest.c
+@@ -28,12 +28,12 @@ int main() {
+     gettime(&start);
+     printf(0, "starting test at %d hours %d minutes %d seconds\n", start.hour, start.minute, start.second);
+     if ((pid1 = fork()) == 0) {
+-        settickets(800);
++        settickets(80);
+         spin(80);
+         exit();
+     }
+     else if ((pid2 = fork()) == 0) {
+-        settickets(200);
++        settickets(20);
+         spin(20);
+         exit();
+     }
+-- 
+1.9.1
+

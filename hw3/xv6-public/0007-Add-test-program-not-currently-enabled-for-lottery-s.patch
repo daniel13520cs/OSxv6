@@ -1,0 +1,62 @@
+From 0f00e113ce21ee7b536e1dc237189271c79a7ab1 Mon Sep 17 00:00:00 2001
+From: Brendan Dolan-Gavitt <brendandg@gatech.edu>
+Date: Mon, 12 Oct 2015 11:28:39 -0400
+Subject: [PATCH 07/13] Add test program (not currently enabled) for lottery
+ scheduler
+
+---
+ lotterytest.c | 42 ++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 42 insertions(+)
+ create mode 100644 lotterytest.c
+
+diff --git a/lotterytest.c b/lotterytest.c
+new file mode 100644
+index 0000000..4968acf
+--- /dev/null
++++ b/lotterytest.c
+@@ -0,0 +1,42 @@
++#include "types.h"
++#include "user.h"
++#include "date.h"
++
++// Do some useless computations
++void spin(int tix) {
++    struct rtcdate end;
++    unsigned x = 0;
++    unsigned y = 0;
++    while (x < 100000) {
++        y = 0;
++        while (y < 10000) {
++            y++;
++        }
++        x++;
++    }
++
++    gettime(&end);
++    printf(0, "spin with %d tickets ended at %d hours %d minutes %d seconds\n", tix, end.hour, end.minute, end.second);
++}
++
++int main() {
++    int pid1;
++    int pid2;
++    struct rtcdate start;
++    gettime(&start);
++    printf(0, "starting test at %d hours %d minutes %d seconds\n", start.hour, start.minute, start.second);
++    if ((pid1 = fork()) == 0) {
++        settickets(80);
++        spin(80);
++        exit();
++    }
++    else if ((pid2 = fork()) == 0) {
++        settickets(20);
++        spin(20);
++        exit();
++    }
++    // Go to sleep and wait for subprocesses to finish
++    wait();
++    wait();
++    exit();
++}
+-- 
+1.9.1
+

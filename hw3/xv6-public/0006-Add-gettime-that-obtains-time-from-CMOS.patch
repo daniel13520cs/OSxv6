@@ -1,0 +1,45 @@
+From 45e398a06e48158763df0cf506e9737834fc7e9e Mon Sep 17 00:00:00 2001
+From: Brendan Dolan-Gavitt <brendandg@gatech.edu>
+Date: Mon, 12 Oct 2015 11:26:02 -0400
+Subject: [PATCH 06/13] Add gettime() that obtains time from CMOS
+
+---
+ sysproc.c | 10 +++++-----
+ user.h    |  2 +-
+ 2 files changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/sysproc.c b/sysproc.c
+index 14603e1..ddaed7c 100644
+--- a/sysproc.c
++++ b/sysproc.c
+@@ -92,9 +92,9 @@ sys_uptime(void)
+ 
+ int
+ sys_gettime(void) {
+-    unsigned long long *n;
+-    if (argptr(0, (char **)&n, 8) < 0)
+-        return -1;
+-    *n = rdtsc();
+-    return 0;
++  struct rtcdate *d;
++  if (argptr(0, (char **)&d, sizeof(struct rtcdate)) < 0)
++      return -1;
++  cmostime(d);
++  return 0;
+ }
+diff --git a/user.h b/user.h
+index a708aed..46d1059 100644
+--- a/user.h
++++ b/user.h
+@@ -23,7 +23,7 @@ int getpid(void);
+ char* sbrk(int);
+ int sleep(int);
+ int uptime(void);
+-void gettime(unsigned long long *);
++int gettime(struct rtcdate *);
+ 
+ // ulib.c
+ int stat(char*, struct stat*);
+-- 
+1.9.1
+

@@ -1,0 +1,43 @@
+From 0146f59c322e58db7bebe0376323331b59a766f7 Mon Sep 17 00:00:00 2001
+From: Brendan Dolan-Gavitt <daniel13520cs@gmail.com>
+Date: Mon, 2 Apr 2018 15:02:44 -0400
+Subject: [PATCH 09/13] add procdump
+
+---
+ proc.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/proc.c b/proc.c
+index b122e3b..9b08dea 100644
+--- a/proc.c
++++ b/proc.c
+@@ -101,6 +101,8 @@ userinit(void)
+ 
+   safestrcpy(p->name, "initcode", sizeof(p->name));
+   p->cwd = namei("/");
++  //ticket
++  p->ticket = 10;
+ 
+   p->state = RUNNABLE;
+ }
+@@ -148,7 +150,8 @@ fork(void)
+   np->sz = proc->sz;
+   np->parent = proc;
+   *np->tf = *proc->tf;
+-
++  //copy ticket number
++  np->ticket = proc->ticket;
+   // Clear %eax so that fork returns 0 in the child.
+   np->tf->eax = 0;
+ 
+@@ -463,6 +466,7 @@ procdump(void)
+       state = states[p->state];
+     else
+       state = "???";
++    cprintf("ticket = %d@@", p->ticket);
+     cprintf("%d %s %s", p->pid, state, p->name);
+     if(p->state == SLEEPING){
+       getcallerpcs((uint*)p->context->ebp+2, pc);
+-- 
+1.9.1
+

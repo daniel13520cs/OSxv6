@@ -1,0 +1,20 @@
+From 2056cbd2b86d1cd0d5c3853287fda7bd7c305bf3 Mon Sep 17 00:00:00 2001
+From: Brendan Dolan-Gavitt <brendandg@gatech.edu>
+Date: Sun, 11 Oct 2015 18:06:27 -0400
+Subject: [PATCH 05/13] Expose genrand() as well as random_at_most()
+
+---
+ rand.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/rand.h b/rand.h
+index 316eec3..01affcb 100644
+--- a/rand.h
++++ b/rand.h
+@@ -1,2 +1,3 @@
+ void sgenrand(unsigned long);
++long genrand(void);
+ long random_at_most(long);
+-- 
+1.9.1
+
